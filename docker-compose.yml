@@ -7,7 +7,7 @@
 
 services:
   db:
-    image: postgres:14
+    image: docker.io/postgres:14
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -21,7 +21,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio
+    image: docker.io/minio/minio
     environment:
       MINIO_DOMAIN: localhost # Needed to enable virtual host style requests
       # Encryption stuff
@@ -49,7 +49,7 @@ services:
 
   # Service to create buckets and set up encryption on Minio
   createbuckets:
-    image: minio/mc
+    image: docker.io/minio/mc
     depends_on:
       minio:
         condition: service_healthy
@@ -64,7 +64,7 @@ services:
       "
 
   imgproxy:
-    image: darthsim/imgproxy
+    image: docker.io/darthsim/imgproxy
     environment:
       # Imgproxy encryption stuff
       IMGPROXY_KEY: "aaaa"
@@ -132,8 +132,8 @@ services:
       - source: nginx.conf
         target: /etc/nginx/nginx.conf
     volumes:
-      - .:/app
-      - _elixir_build:/app/_build # So that we can have separate build files for the host and the container
+      - .:/app:Z
+      - _elixir_build:/app/_build # So that we can have separate build files for the host and the container:Z
     depends_on:
       - db
 

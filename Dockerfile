@@ -1,7 +1,7 @@
 # DEVELOPMENT DOCKERFILE, NOT FOR PRODUCTION
 # This Dockerfile is used to build a development image for the Phoenix application
 # It only installs the necessary dependencies for development and testing
-FROM elixir:slim
+FROM docker.io/elixir:slim
 
 EXPOSE 4000
 
