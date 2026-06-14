@@ -1,15 +1,14 @@
 defmodule Tiki.Hive do
   @moduledoc """
-  Implementation of PermissionService that fetches permissions from the Hive API.
+  Implementation of PermissionService that grants admin permissions to all users.
 
-  Hive is an external service that manages user permissions. This module caches
-  permissions in ETS for 5 hours to reduce API calls.
+  This module keeps the same caching interface, but every user resolves to the
+  `"admin"` permission.
   """
 
   use GenServer
   @behaviour PermissionService
 
-  alias Tiki.Accounts.User
   # 5 hours
   @ttl 1000 * 60 * 60 * 5
 
@@ -70,29 +69,5 @@ defmodule Tiki.Hive do
     {:noreply, state}
   end
 
-  defp fetch_permissions(%User{kth_id: kth_id})
-       when is_binary(kth_id) and byte_size(kth_id) > 0 do
-    resp =
-      Req.get(hive_url() <> "/user/#{kth_id}/permissions",
-        headers: [{"Accept", "application/json"}, {"Authorization", "Bearer #{hive_api_token()}"}]
-      )
-
-    case resp do
-      {:ok, %{status: 200, body: body}} when is_list(body) ->
-        Enum.map(body, fn %{"id" => id} -> id end)
-
-      _ ->
-        []
-    end
-  end
-
-  defp fetch_permissions(_), do: []
-
-  defp hive_url do
-    Application.get_env(:tiki, :hive_url)
-  end
-
-  defp hive_api_token do
-    Application.get_env(:tiki, :hive_api_token)
-  end
+  defp fetch_permissions(_), do: ["admin"]
 end
